@@ -44,20 +44,20 @@ jobs:
             exit 1
           fi
 
-deploy:
-  name: Deploy na Vercel
-  runs-on: ubuntu-latest
-  needs: test
-  if: github.ref == 'refs/heads/master'
+  deploy:
+    name: Deploy na Vercel
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master'
 
-  steps:
-    - name: Checkout do código
-      uses: actions/checkout@v3
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
 
-    - name: Deploy para Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel_token: ${{ secrets.VERCEL_TOKEN }}
-        vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
-        vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
-        vercel_args: '--prod'
+      - name: Deploy para Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+          vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel_args: '--prod'
