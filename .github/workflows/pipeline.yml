@@ -1,5 +1,6 @@
 name: Pipeline CI/CD - DevOps
 
+# Definir os gatilhos para a pipeline: quando houver push ou pull request na branch master
 on:
   push:
     branches: [ master ]
@@ -12,9 +13,10 @@ jobs:
     name: Verificar arquivos do projeto
     runs-on: ubuntu-latest
 
+    # Passos para verificar os arquivos do projeto
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Verificar se index.html existe
         run: |
@@ -51,7 +53,7 @@ jobs:
 
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy para Vercel
         uses: amondnet/vercel-action@v25
