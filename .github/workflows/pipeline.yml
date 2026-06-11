@@ -1,20 +1,24 @@
 name: Pipeline CI/CD - DevOps
 
+# Definir gatilhos para execução do workflow
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
 
+# Definir variáveis de ambiente para autenticação com a Vercel
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+# Definir os jobs do workflow
 jobs:
   test:
     name: Verificar arquivos do projeto
     runs-on: ubuntu-latest
 
+    # Definir os passos do job de teste
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -28,6 +32,7 @@ jobs:
       - name: Verificar sintaxe do JavaScript
         run: node --check script.js
 
+  # Definir o job de deploy, que depende do job de teste
   deploy:
     name: Deploy na Vercel
     runs-on: ubuntu-latest
