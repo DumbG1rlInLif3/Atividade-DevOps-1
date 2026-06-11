@@ -1,50 +1,33 @@
 name: Pipeline CI/CD - DevOps
 
-# Definir os gatilhos para a pipeline: quando houver push ou pull request na branch master
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 jobs:
-  # ✅ ETAPA 1 - Verificar se o index.html existe
   test:
     name: Verificar arquivos do projeto
     runs-on: ubuntu-latest
 
-    # Passos para verificar os arquivos do projeto
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Verificar se index.html existe
+      - name: Verificar arquivos obrigatórios
         run: |
-          echo "🔍 Verificando se index.html existe..."
-          if [ -f "index.html" ]; then
-            echo "✅ index.html encontrado!"
-          else
-            echo "❌ index.html NÃO encontrado!"
-            exit 1
-          fi
+          test -f index.html
+          test -f style.css
+          test -f script.js
 
-      - name: Verificar se style.css existe
-        run: |
-          if [ -f "style.css" ]; then
-            echo "✅ style.css encontrado!"
-          else
-            echo "⚠️ style.css não encontrado."
-          fi
+      - name: Verificar sintaxe do JavaScript
+        run: node --check script.js
 
-      - name: Verificar se script.js existe
-        run: |
-          if [ -f "script.js" ]; then
-            echo "✅ script.js encontrado!"
-          else
-            echo "⚠️ script.js não encontrado."
-          fi
-
-  # 🚀 ETAPA 2 - Deploy na Vercel (só roda se os testes passarem)
   deploy:
     name: Deploy na Vercel
     runs-on: ubuntu-latest
@@ -55,10 +38,14 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Deploy para Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
+      - name: Instalar Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Baixar configurações da Vercel
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Fazer build do projeto
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Publicar na Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
